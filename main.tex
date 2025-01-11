@@ -13,13 +13,12 @@
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage{xcolor}
-
+\usepackage[T1]{fontenc}
+\usepackage{listings}
 \title{\textbf{QASST Project}}
-\author{student1, first1.last1@ubbcluj.ro\\
-student2, first2.last2@ubbcluj.ro\\
-student3, first3.last3@ubbcluj.ro\\
-student4, first4.last4@ubbcluj.ro\\
-student5, first5.last5@ubbcluj.ro}
+\author{Terec Andrei-Sorin, andrei.terec@stud.ubbcluj.ro\\
+Pop David, david.alexandru.pop@stud.ubbcluj.ro\\
+George Popovici, george.ioan.popovici@stud.ubbcluj.ro}
 \newpage
 
 \begin{document}
@@ -35,35 +34,50 @@ student5, first5.last5@ubbcluj.ro}
 
 \textcolor{blue}{Provide 2-3 sentences with details about the application under test. Any type of application is accepted (web application, mobile application, demo app from some Practice Lab, e.g., PortSwigger$->$ Academy$->$ Vulnerabilities Lab, etc.).}
 
+We are testing the bWAPP web application.
+bWAPP, or a buggy web application, is a free and open source deliberately insecure web application.
+bWAPP is a PHP application that uses a MySQL database. It can be hosted on Linux/Windows with Apache/IIS and MySQL.
 
 
 \section{Approach on Security}
 \label{}
 
 \textcolor{blue}{Describe in 1-2 paragraphs the approach used to address security. \\
-E.g., Defensive testing, offensive testing, or a mixed approach is accepted.
+    E.g., Defensive testing, offensive testing, or a mixed approach is accepted.
 }
+We are doing a mixed approach.
+Terec Andrei and Popovici George-Ioan are doing offensive testing and Pop David is doing defensive testing.
+
+TODO: dupa ce ne decidem toti despre ce facem, poate mai putem adauga ceva aici
 
 \section{Strategy Applied}
 \label{}
 
 \textcolor{blue}{\textit{For the offensive approach} $->$ Provide 1-2 paragraphs to describe the strategy steps used to detect vulnerabilities.\\
-\textit{For the defensive approach} $->$ Detail the code that will be scanned for vulnerabilities.
+    \textit{For the defensive approach} $->$ Detail the code that will be scanned for vulnerabilities.
 }
+
+\subsection{Offensive approach}
+We are going to manually test different malformed inputs, especially combinations of caracters that are know that can dangerous user input for a web server with PHP and MySQL.
+This type of caracters are double quotes and HTML tags
+\subsection{Defensive approach}
+TODO: Completeaza David
 
 
 \section{Vulnerabilities}
 \label{}
 
 \textcolor{blue}{\textit{For the defensive approach} $->$ \\(1) Use a SAST tool (e.g., Snyk) to scan the code.\\
-(2) Each student that addresses the defensive approach should choose \textbf{min. 3 vulnerabilities} of different severity levels (critical, high, medium, low) to be investigated and remediated later.}
+    (2) Each student that addresses the defensive approach should choose \textbf{min. 3 vulnerabilities} of different severity levels (critical, high, medium, low) to be investigated and remediated later.}
 
 \textcolor{blue}{\textit{For the offensive approach} $->$\\
-Each student that addresses the offensive approach should describe shortly \textbf{2 vulnerabilities} that will be investigated and remediated later.
+    Each student that addresses the offensive approach should describe shortly \textbf{2 vulnerabilities} that will be investigated and remediated later.
 }
 
 Vulnerability 01. several details (what, how, ...) \textit{CWE-89: SQL Injection} or category \textit{A03:2021-Injection}  \cite{Vuln001} is investigated as data... [reasoning about choosing to investigate the particular vulnerability.]
 
+Vulnerability 01. On the path /bWAPP/xss\_stored\_1.php is a blog post where you can upload comments.
+We are going to exploit the vulnerability CWE-79: Stored XSS.
 
 
 \section{Aimed Assets}
@@ -82,8 +96,8 @@ Vulnerability 01. several details (what, how, ...) \textit{CWE-89: SQL Injection
 \section{Tools Employed}
 \label{}
 
-\textcolor{blue}{Provide min. 1 paragraph with details about \textit{each} tool used to scan the code (e.g., Snyk) or to expose the selected vulnerabilities in the software (e.g., Burp Suite). 
-Identify the type of the tool (SAST, DAST) and provide at least 2 benefits of each tool used.
+\textcolor{blue}{Provide min. 1 paragraph with details about \textit{each} tool used to scan the code (e.g., Snyk) or to expose the selected vulnerabilities in the software (e.g., Burp Suite).
+    Identify the type of the tool (SAST, DAST) and provide at least 2 benefits of each tool used.
 }
 
 
@@ -91,29 +105,29 @@ Identify the type of the tool (SAST, DAST) and provide at least 2 benefits of ea
 \label{}
 
 \textcolor{blue}{\textit{For the offensive approach} $->$\\
-(1) For each vulnerability, \\
--- indicate/identify at least one test design technique employed to design test cases.\\
--- fill in a table with at least 3 test cases (TCs) that may expose that vulnerability.\\
-(2) For each TC indicate the input, expected output, and the actual result.\\
-(3) Manual testing or tool-based testing can be used (e.g., fuzzing).\\
-(4) Include screenshots or tool-generated reports for the performed scan/testing.}
+    (1) For each vulnerability, \\
+    -- indicate/identify at least one test design technique employed to design test cases.\\
+    -- fill in a table with at least 3 test cases (TCs) that may expose that vulnerability.\\
+    (2) For each TC indicate the input, expected output, and the actual result.\\
+    (3) Manual testing or tool-based testing can be used (e.g., fuzzing).\\
+    (4) Include screenshots or tool-generated reports for the performed scan/testing.}
 
 \textcolor{blue}{\textit{For the defensive approach} $->$\\
-Include a screenshot of the report that consists of \\
-(1) the report summary (\#C, \#H, \#M, \#L) and \\
-(2) details about the vulnerabilities detected.}
+    Include a screenshot of the report that consists of \\
+    (1) the report summary (\#C, \#H, \#M, \#L) and \\
+    (2) details about the vulnerabilities detected.}
 
 \textcolor{blue}{Input of TCs may represent data, some SQL statements, etc. Expected output of TCs is any data or results presented to the user.}
 
 \begin{table} [htpb]
-\centering
-\begin{tabular}{l|l|l|l|l}
-Feature & TC ID & Input1 & Input2 & Expected Output \\ \hline
-F001  &TC01 & 42 & 15 & 100\\
-F001  &TC02 & 1 & -2 & 3\\
-F002  &TC03 & 111 & 90 & -74
-\end{tabular}
-\caption{\label{tab:TCs1}TCs table.}
+    \centering
+    \begin{tabular}{l|l|l|l|l}
+        Feature & TC ID & Input1 & Input2 & Expected Output \\ \hline
+        F001    & TC01  & 42     & 15     & 100             \\
+        F001    & TC02  & 1      & -2     & 3               \\
+        F002    & TC03  & 111    & 90     & -74             \\
+    \end{tabular}
+    \caption{\label{tab:TCs1}TCs table.}
 \end{table}
 
 \textcolor{blue}{Table \ref{tab:TCs1} shows the TCs designed to evaluate the vulnerability AAA over F001 and F002.}
@@ -122,17 +136,86 @@ F002  &TC03 & 111 & 90 & -74
 \textcolor{magenta}{This section should include test design for all team members.}
 
 
+For the XSS - Stored (Blog) path
+TODO: test design tehnique?
+\begin{table} [htpb]
+    \centering
+    \begin{tabular}{l|l|l|l|l}
+        Feature & TC ID & Input                     & Expected Output           & Output              \\ \hline
+        F001    & TC01  & Test                      & Test                      & Test                \\
+        F001    & TC02  & " --                      & " --                      & \textbackslash " -- \\
+        F002    & TC03  & <script>alert(1)</script> & <script>alert(1)</script> & Prints out 1        \\
+    \end{tabular}
+    \caption{\label{tab:TC-XSS}TCs XSS table.}
+\end{table}
+
+
 \section{Vulnerability Exploit}
 \label{}
 
 \textcolor{blue}{\textit{For the defensive approach} $->$\\
--- Imagine an attack scenario and attempt to exploit the vulnerability.\\
--- For successful attempts provide proof of the compromised assets, e.g., screenshot, data extracted, etc.}
+    -- Imagine an attack scenario and attempt to exploit the vulnerability.\\
+    -- For successful attempts provide proof of the compromised assets, e.g., screenshot, data extracted, etc.}
 
 \textcolor{blue}{\textit{For the offensive approach} $->$\\
--- Provide steps executed manually or some script that allows the exploitation of the vulnerability and compromise of the asset(s).\\
--- Include proof of the asset compromised, i.e., screenshot, data exposed/received, etc. }
+    -- Provide steps executed manually or some script that allows the exploitation of the vulnerability and compromise of the asset(s).\\
+    -- Include proof of the asset compromised, i.e., screenshot, data exposed/received, etc. }
 
+
+\subsection{XSS store exploit}
+\label{section:xss-store-exploit}
+We can use the beef project to exploit this vulnerability. First, we need to download and install this project on the attacker host from the git repository: https://github.com/beefproject/beef.
+
+After we installed it and run the program, we can expose this service online using port forwarding or a reverse proxy, like ngrok.\ref{fig:beef-server-started}
+In this test run, the user machine attacked is in the same LAN network as the attacker, so this step is not needed.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/beef/beef-server-started.png}
+    \caption{\label{fig:beef-server-started}beef server started}
+\end{figure}
+
+
+Now we need to install the hook using the xss vulnerability we found earlier. In our case, the hook url is at http://10.0.2.15:3000/hook.js
+For this we need to send a comment with our script hook. \ref{fig:inject-hook}
+Now, we are in. Every user that wants to see the comments will automatically load our javascript script, unless they have disabled javascript execution.
+When a user sees the comment section, we get a lot of informations about them, like the browser they are using, the operation system, the browser plugins installed, the device width and height, arhitecture, number of CPU cores and much more without the user even clicking a malicious link.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/beef/inject-hook.png}
+    \caption{\label{fig:inject-hook}Injecting te=he javascript hook into the website}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/beef/browser-details.png}
+    \caption{\label{fig:browser-details}User browser informations}
+\end{figure}
+
+
+Now, from the Commands tab, we can send malicious comamnds to this user. For example, we can send them a popout that they need to login again into their facebook account. \ref{fig:send-pretty-theft}
+After clicking the Execute button, the user is less prepared for this to be a phishing attempt, because they are on a site they trust and is more likely that they will fill the data requested by the phishing attempt. \ref{fig:filling-phishing-attempt}
+When the user presses log in, the data is send to the attacker and the phishing attack has a succes. \ref{fig:filling-phishing-attempt}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/beef/send-pretty-theft.png}
+    \caption{\label{fig:send-pretty-theft}How we can send a phishing attack using beef}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/beef/filling-phishing-attempt.png}
+    \caption{\label{fig:filling-phishing-attempt}How the phishing attack looks for the user}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/beef/data-received.png}
+    \caption{\label{fig:data-received}The collected data from the user}
+\end{figure}
 
 \subsection{Manual Exploit}
 \label{}
@@ -152,18 +235,110 @@ F002  &TC03 & 111 & 90 & -74
 \label{}
 
 \textcolor{blue}{\textit{For the offensive approach} $->$\\
-(1) Indicate steps to provide vulnerability remediation. E.g., piece of code, particular recommendations, etc.}
+    (1) Indicate steps to provide vulnerability remediation. E.g., piece of code, particular recommendations, etc.}
 
 \textcolor{blue}{\textit{For the defensive approach} $->$\\
-(1) Remediate/neutralize the vulnerabilities selected (3+) following the SAST tool recommendations.}\\
+    (1) Remediate/neutralize the vulnerabilities selected (3+) following the SAST tool recommendations.}\\
 \textcolor{blue}{(2) For each vulnerability indicate the change in the code that is applied to fix the vulnerability. If there are multiple solutions available provide reasoning for the selected one.} \\
 \textcolor{blue}{(3) Perform re-scan to prove the removal of the vulnerability, i.e., include a screenshot with a report summary (\#C, \#H, \#M, \#L) and details about the vulnerabilities re-detected.}
+
+\subsection{XSS attack}
+\label{xss-attack}
+To find out how we can remediat this attack, we need to see the source code.
+
+
+\begin{lstlisting}[caption={XSS Code},label=php:xss-attack]
+while($row = $recordset->fetch_object())
+{
+
+    if($_COOKIE["security_level"] == "2")
+    {
+
+
+
+?>
+        <tr height="40">
+
+            <td align="center"><?php echo $row->id; ?></td>
+            <td><?php echo $row->owner; ?></td>
+            <td><?php echo $row->date; ?></td>
+            <td>
+            <?php echo htmlspecialchars($row->entry, ENT_QUOTES, "UTF-8"); ?>
+            </td>
+
+        </tr>
+
+<?php
+
+    }
+
+    else
+        
+        if($_COOKIE["security_level"] == "1")
+        {
+
+?>
+        <tr height="40">
+
+            <td align="center"><?php echo $row->id; ?></td>
+            <td><?php echo $row->owner; ?></td>
+            <td><?php echo $row->date; ?></td>
+            <td><?php echo addslashes($row->entry); ?></td>
+
+        </tr>
+
+<?php
+
+        }
+        
+        else        
+
+            {
+
+?>
+        <tr height="40">
+
+            <td align="center"><?php echo $row->id; ?></td>
+            <td><?php echo $row->owner; ?></td>
+            <td><?php echo $row->date; ?></td>
+            <td><?php echo $row->entry; ?></td>
+
+        </tr>
+
+<?php          
+
+            }
+
+}
+\end{lstlisting}
+
+The relevant section is \label{php:xss-attack}, where we can see how the data is displayed.
+When the security level is 0, or low, they don't attempt to process the data and sends it into a html page as it is. This allows XSS and html injection attacks.
+When the security level is 1, or medium, they prepare the string using the addslashes php function.
+This function does the following:
+
+
+addslashes - returns a string with backslashes before characters that need to be quoted in database queries etc.
+These characters are single quote ('), double quote ("), backslash (\textbackslash) and NUL (the NULL byte).
+
+
+This doesn't say anything about < and > caracters, as this function is used to prevent SQL Injection attacks, not XSS attacks.
+So the medium difficulty also doesn't prevent the attack described in section \ref{section:xss-store-exploit}.
+
+The high security level, when security\_level is set to 2, is how we can remediate this error.
+Using the correct function, htmlspecialchars, it escapes all html special caracters and the script no longer works. \ref{fig:no-longer-works}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/beef/no-longer-works.png}
+    \caption{\label{fig:no-longer-works}XSS attack remediation}
+\end{figure}
 
 \section{Conclusions}
 \label{}
 
 \textcolor{blue}{Include final conclusions, lessons learned and personal considerations while working on QASSTP (3-4 paragraphs).\\
-You can focus on the following aspects: type of application to be tested, amount of knowledge to use (related or not to testing), tools required to apply, team collaboration, amount of time needed to fulfill the tasks, etc.}
+    You can focus on the following aspects: type of application to be tested, amount of knowledge to use (related or not to testing), tools required to apply, team collaboration, amount of time needed to fulfill the tasks, etc.}
 
 \section{Other sections...}
 
@@ -175,9 +350,9 @@ First you have to upload the image file from your computer using the upload link
 Note that your figure will automatically be placed in the most appropriate place for it, given the surrounding text and taking into account other figures or tables that may be close by. You can find out more about adding images to your documents in this help article on \href{https://www.overleaf.com/learn/how-to/Including_images_on_Overleaf}{including images on Overleaf}.
 
 \begin{figure}
-\centering
-\includegraphics[width=0.25\linewidth]{Figures/frog.jpg}
-\caption{\label{fig:frog}This frog was uploaded via the file-tree menu.}
+    \centering
+    \includegraphics[width=0.25\linewidth]{Figures/frog.jpg}
+    \caption{\label{fig:frog}This frog was uploaded via the file-tree menu.}
 \end{figure}
 
 
