@@ -514,6 +514,9 @@ shell_exec("ping -c 1 " . commandi($target));
 \section{Conclusions}
 \label{}
 
+Is important to correctly validate user input. The best way to validate user input is with predefined functions like \textit{htmlspecialchars}, \textit{addslashes}, \textit{escapeshellcmd}.
+When such function are not available, always have a whitelist of caracters instead of a blacklist.
+In case you miss a caracter from the whitelist, at worst case the user experiance is not the greatest, but if you miss a caracter from a blacklist, you leave yourself vulnerable to have a backdoor installed on your server, even after you remediate the error.
 \textcolor{blue}{Include final conclusions, lessons learned and personal considerations while working on QASSTP (3-4 paragraphs).\\
     You can focus on the following aspects: type of application to be tested, amount of knowledge to use (related or not to testing), tools required to apply, team collaboration, amount of time needed to fulfill the tasks, etc.}
 
