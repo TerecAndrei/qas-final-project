@@ -13,8 +13,35 @@
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage{xcolor}
+\usepackage[many]{tcolorbox}
 \usepackage[T1]{fontenc}
 \usepackage{listings}
+
+\definecolor{dkgreen}{rgb}{0,.6,0}
+\definecolor{dkblue}{rgb}{0,0,.6}
+\definecolor{dkyellow}{cmyk}{0,0,.8,.3}
+
+\lstset{
+  language        = php,
+  basicstyle      = \small\ttfamily,
+  keywordstyle    = \color{dkblue},
+  stringstyle     = \color{red},
+  identifierstyle = \color{dkgreen},
+  commentstyle    = \color{gray},
+  emph            =[1]{php},
+  emphstyle       =[1]\color{black},
+  emph            =[2]{if,and,or,else},
+  emphstyle       =[2]\color{dkyellow}
+}
+
+\lstset{
+  language        = php,
+  basicstyle=\ttfamily,
+  showstringspaces=false,
+  commentstyle=\color{red},
+  keywordstyle=\color{blue}
+}
+
 \title{\textbf{QASST Project}}
 \author{Terec Andrei-Sorin, andrei.terec@stud.ubbcluj.ro\\
 Pop David, david.alexandru.pop@stud.ubbcluj.ro\\
@@ -77,8 +104,13 @@ TODO: Completeaza David
 Vulnerability 01. several details (what, how, ...) \textit{CWE-89: SQL Injection} or category \textit{A03:2021-Injection}  \cite{Vuln001} is investigated as data... [reasoning about choosing to investigate the particular vulnerability.]
 
 Vulnerability 01. On the path /bWAPP/xss\_stored\_1.php is a blog post where you can upload comments.
-We are going to exploit the vulnerability CWE-79: Stored XSS.
+We are going to exploit the vulnerability \textit{CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')} \cite{vul:xss}.
+Stored XSS is a type of Cross-Site Scripting vulnerability where malicious scripts are permanently stored on a target server (e.g., in a database, comments, or user profile fields). When other users access the affected page, the script executes in their browsers.
 
+Vulnerability 02. On the path /bWAPP/commandi\_blind.php is a page that pings the ip provided.
+We are going to exploit the vulnerability \textit{CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')} \cite{vul:command-injection}
+
+OS Command Injection is a security vulnerability that occurs when an application executes operating system commands using untrusted user input without proper validation or sanitization. Attackers exploit this flaw to inject and execute arbitrary commands on the server, potentially gaining unauthorized access or control.
 
 \section{Aimed Assets}
 \label{}
@@ -144,10 +176,20 @@ TODO: test design tehnique? Adauga fotografie
         Feature & TC ID & Input                     & Expected Output           & Output              \\ \hline
         F001    & TC01  & Test                      & Test                      & Test                \\
         F001    & TC02  & " --                      & " --                      & \textbackslash " -- \\
-        F002    & TC03  & <script>alert(1)</script> & <script>alert(1)</script> & Prints out 1        \\
+        F001    & TC03  & <script>alert(1)</script> & <script>alert(1)</script> & Prints out 1        \\
     \end{tabular}
     \caption{\label{tab:TC-XSS}TCs XSS table.}
 \end{table}
+
+As we can see in \ref{fig:xss-alert}, the script is executed, this means there is a XSS attack.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/beef/xss-alert.png}
+    \caption{\label{fig:xss-alert}The alert script executed}
+\end{figure}
+
+
 
 \subsection{OS Command Injection}
 TODO: test design tehnique?
@@ -160,21 +202,27 @@ If the server waits 5 seconds before sending a response, we know that we managed
     \centering
     \begin{tabular}{l|l|l|l|l}
         Feature & TC ID & Input                  & Expected Output        & Output                 \\ \hline
-        F001    & TC01  & 127.0.0.1              & Immediately Terminates & Immediately Terminates \\
+        F002    & TC01  & 127.0.0.1              & Immediately Terminates & Immediately Terminates \\
         F002    & TC02  & 127.0.0.1; sleep 5     & Immediately Terminates & Immediately Terminates \\
-        F003    & TC03  & 127.0.0.1 \&\& sleep 5 & Immediately Terminates & Immediately Terminates \\
-        F004    & TC04  & 127.0.0.1 || sleep 5   & Immediately Terminates & Immediately Terminates \\
-        F005    & TC05  & 127.0.0.0 || sleep 5   & Immediately Terminates & Waits ~5 seconds       \\
-        F006    & TC06  & || sleep 5             & Immediately Terminates & Waits ~5 seconds       \\
-        F007    & TC07  & 127.0.0.1 | sleep 5    & Immediately Terminates & Waits ~5 seconds       \\
+        F002    & TC03  & 127.0.0.1 \&\& sleep 5 & Immediately Terminates & Immediately Terminates \\
+        F002    & TC04  & 127.0.0.1 || sleep 5   & Immediately Terminates & Immediately Terminates \\
+        F002    & TC05  & 127.0.0.0 || sleep 5   & Immediately Terminates & Waits ~5 seconds       \\
+        F002    & TC06  & || sleep 5             & Immediately Terminates & Waits ~5 seconds       \\
+        F002    & TC07  & 127.0.0.1 | sleep 5    & Immediately Terminates & Waits ~5 seconds       \\
     \end{tabular}
     \caption{\label{tab:TC-command-injection}TCs OS Command Injection table.}
 \end{table}
 
-As we can see in the table \ref{tab:TC-command-injection}, it seems that only the \& and ; caracters are escaped/removed and we can still exploit it using the "|" caracter.
+As we can see in the table \ref{tab:TC-command-injection} and figure \ref{fig:sleep-command}, it seems that only the \& and ; caracters are escaped/removed and we can still exploit it using the "|" caracter.
 We can either create an or command with "||". Because of lazy evaluation, the second command will be evaluated only if the first command failed.
 We can make the command fail if we don't suply an argument or an invalid one.
 The other way we can inject a command is with the pipe operator, which works regardles of if the first command ends with success or failure.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/command-injection/sleep-command.png}
+    \caption{\label{fig:sleep-command}After running the sleep command, the server waits 5 seconds before returning}
+\end{figure}
 
 
 \section{Vulnerability Exploit}
@@ -401,6 +449,67 @@ Using the correct function, htmlspecialchars, it escapes all html special caract
     \includegraphics[width=1\linewidth]{Figures/beef/no-longer-works.png}
     \caption{\label{fig:no-longer-works}XSS attack remediation}
 \end{figure}
+
+\subsection{Command Injection}
+From the test we can already tell that there are improper parameter validation on medium security. On low difficulty there is no validation.
+
+We can see that on medium security, only the \& and ; caracters are deleted, leaving the | caracters as they are.
+A bad way to fix it would be to also remove the | caracters, as you don't include the redirect operators and in always better to have a whitelist of caracters, rather than a blacklist.
+The way to fix it is using the escapeshellcmd command, as it is used on the hard security level
+\begin{lstlisting}[language=php,caption={Backdoor Code},label=php:command-injection-code]
+function commandi_check_1($data)
+{
+    
+    $input = str_replace("&", "", $data);
+    $input = str_replace(";", "", $input);
+    
+    return $input;
+    
+}
+
+function commandi_check_2($data)
+{
+   
+    return escapeshellcmd($data);
+    
+}
+
+function commandi($data)
+{
+
+    switch($_COOKIE["security_level"])
+    {
+
+        case "0" :
+
+            $data = no_check($data);
+            break;
+
+        case "1" :
+
+            $data = commandi_check_1($data);
+            break;
+
+        case "2" :
+
+            $data = commandi_check_2($data);
+            break;
+
+        default :
+
+            $data = no_check($data);
+            break;
+
+    }
+
+    return $data;
+
+}
+
+
+shell_exec("ping -c 1 " . commandi($target));
+\end{lstlisting}
+
 
 \section{Conclusions}
 \label{}
