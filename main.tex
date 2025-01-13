@@ -16,6 +16,9 @@
 \usepackage[many]{tcolorbox}
 \usepackage[T1]{fontenc}
 \usepackage{listings}
+\usepackage{booktabs}
+\usepackage{float}
+
 
 \definecolor{dkgreen}{rgb}{0,.6,0}
 \definecolor{dkblue}{rgb}{0,0,.6}
@@ -65,7 +68,6 @@ We are testing the bWAPP web application.
 bWAPP, or a buggy web application, is a free and open source deliberately insecure web application.
 bWAPP is a PHP application that uses a MySQL database. It can be hosted on Linux/Windows with Apache/IIS and MySQL.
 
-
 \section{Approach on Security}
 \label{}
 
@@ -86,16 +88,19 @@ TODO: dupa ce ne decidem toti despre ce facem, poate mai putem adauga ceva aici
 
 \subsection{Offensive approach}
 We are going to manually test different malformed inputs, especially combinations of caracters that are know that can dangerous user input for a web server with PHP and MySQL.
-This type of caracters are double quotes and HTML tags
+This type of caracters are double quotes and HTML tags.
 \subsection{Defensive approach}
-TODO: Completeaza David
-
+\par For the defensive approache we will go over some well-known vulnerabilities suggested by the scanning tool: SQL Injection, Code Injection and XPath injection. The strategy used relies on the code smells gathered by the security scanning tool. After the vulnerabilities were identified and reproduced, we will try to implement the suggested solutions by the scanner. The levels of the vulnerabilities reproduced are high and critical.
 
 \section{Vulnerabilities}
 \label{}
 
 \textcolor{blue}{\textit{For the defensive approach} $->$ \\(1) Use a SAST tool (e.g., Snyk) to scan the code.\\
     (2) Each student that addresses the defensive approach should choose \textbf{min. 3 vulnerabilities} of different severity levels (critical, high, medium, low) to be investigated and remediated later.}
+\par Vulnerability 1. SQL Injection. On the path /sqli1.php we can find a page on which we can query for movies by title by inputing into a textbox. The Snyk scanner reports the query used in the code as susceptible to SQL Injection and categorize this vulnerability as a high vulnerability. The scanner also suggests multiple solutions to fix this issue \textit{CWE-89: SQL Injection}  \cite{Vuln001}.
+\par Vulnerability 2. XPath. On the path /xmli\_2.php we can find a page on which we can search for movies by their genre. The movies are read from a XML file \textit{CWE-91: XML Injection (aka Blind XPath Injection)} \cite{vul:xpath}. The scanner suggests that the code has a vulnerability in which the xml path can be altered. The solution suggested by the scanner is effective for found vulnerability.
+\par Vulnerability 3. Code Injection. On the path phpi.php we can find a page in which we can print a message. The vulnerability is \textit{
+CWE-94: Improper Control of Generation of Code ('Code Injection')} \cite{vul:code-injection}. The vulnerability allows users to execute php code, as suggested by the scanner. The solution suggested by the scanner is not powerful enough to cover all the cases.
 
 \textcolor{blue}{\textit{For the offensive approach} $->$\\
     Each student that addresses the offensive approach should describe shortly \textbf{2 vulnerabilities} that will be investigated and remediated later.
@@ -117,13 +122,45 @@ OS Command Injection is a security vulnerability that occurs when an application
 
 \textcolor{blue}{Describe in 1-2 paragraphs the assets that may be affected by the presence of the selected vulnerabilities.
 }
+\par The assets that may be affected by the presence of the selected vulnerabilities are: database, web server. The database may be altered, meaning reading data which is not exposed publicly or inserting data which may corrupt the integrity of the database. The web server which is hosting the app can be altered, either by reading data from the server such as folders, users or working at the level of the operating system.
 
 \section{Affected Security Attributes}
 \label{}
-
 \textcolor{blue}{Identify the attributes from CIA triad (or CIAAN, CIANA) that are affected by the presence of the selected vulnerabilities, in relationship with the targeted assets.
 }
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Vulnerability}     & \textbf{Confidentiality} & \textbf{Integrity} & \textbf{Availability} & \textbf{Authentication} & \textbf{Non-repudiation} \\ \midrule
+\textbf{XSS}               & Yes                          & Yes                    & No                         & Yes                            & No                           \\
+\textbf{SQL Injection}     & Yes                          & Yes                    & Yes                        & Yes                            & No                           \\
+\textbf{Code Injection}    & Yes                          & Yes                    & Yes                        & No                             & No                           \\
+\textbf{Command Injection} & Yes                          & Yes                    & Yes                        & Yes                            & No                           \\
+\textbf{XPath Injection}   & Yes                          & Yes                    & No                         & Yes                            & No                           \\ \bottomrule
+\end{tabular}
+\caption{CIAAN Attribute Impact for Various Vulnerabilities}
+\label{tab:vulnerability_impact}
+\end{table}
 
+The table summarizes the impact of various vulnerabilities on the attributes of the CIAAN model:
+
+\begin{itemize}
+    \item \textbf{Cross-Site Scripting (XSS)}: 
+    XSS affects \textbf{Confidentiality} by enabling attackers to steal sensitive data such as session cookies. It impacts \textbf{Integrity} by allowing attackers to modify the content of web pages. XSS may also compromise \textbf{Authentication} via session hijacking.
+
+    \item \textbf{SQL Injection}: 
+    This vulnerability affects \textbf{Confidentiality} by exposing sensitive database records. It compromises \textbf{Integrity} by allowing attackers to modify or delete data. \textbf{Availability} is affected when malicious queries disrupt database functionality, and \textbf{Authentication} may be bypassed through malicious input.
+
+    \item \textbf{Code Injection}: 
+    Code injection impacts \textbf{Confidentiality} by exposing sensitive information, \textbf{Integrity} by altering system behavior or data, and \textbf{Availability} by causing disruptions or crashes.
+
+    \item \textbf{Command Injection}: 
+    This affects \textbf{Confidentiality} by providing unauthorized access to system files, \textbf{Integrity} by enabling file or configuration tampering, \textbf{Availability} by disrupting system functionality, and \textbf{Authentication} by potentially creating backdoors.
+
+    \item \textbf{XPath Injection}: 
+    Similar to SQL injection, XPath injection affects \textbf{Confidentiality} by retrieving sensitive XML data, \textbf{Integrity} by allowing data manipulation, and \textbf{Authentication} by enabling bypassing of login mechanisms.
+\end{itemize}
 
 \section{Tools Employed}
 \label{}
@@ -131,7 +168,11 @@ OS Command Injection is a security vulnerability that occurs when an application
 \textcolor{blue}{Provide min. 1 paragraph with details about \textit{each} tool used to scan the code (e.g., Snyk) or to expose the selected vulnerabilities in the software (e.g., Burp Suite).
     Identify the type of the tool (SAST, DAST) and provide at least 2 benefits of each tool used.
 }
-
+The tool used for defensive approach was Snyk. This tool is a Static Application Security Testing (SAST), which scans the code and analyze it and display the found vulnerabilities, along with possible solutions. There are two main benefits to introduce this tool in the development process:
+\begin{itemize}
+    \item It makes the security of the app better by cathing vulnerabilities earlier in the lifecycle of the application
+    \item It helps companies losing less money by cathing the vulnerabilities earlier, being a better improvement to avoid introducing a major vulnerability into the production and losing money, customers or data leaks.
+\end{itemize}
 
 \section{Test Design. Test Execution. Test Report}
 \label{}
@@ -218,13 +259,37 @@ We can either create an or command with "||". Because of lazy evaluation, the se
 We can make the command fail if we don't suply an argument or an invalid one.
 The other way we can inject a command is with the pipe operator, which works regardles of if the first command ends with success or failure.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{Figures/command-injection/sleep-command.png}
     \caption{\label{fig:sleep-command}After running the sleep command, the server waits 5 seconds before returning}
 \end{figure}
 
-
+\subsection{Report summary of vulnerabilities}
+The report summary made by Snyk suggests a number of 349 issues identified in the project, as can be seen in Figure \ref{fig:snyk-report-summary}. There are 97 high, 59 medium and 208 low issues.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/issues.PNG}
+    \caption{Snyk report summary}
+    \label{fig:snyk-report-summary}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/all-issues.PNG}
+    \caption{Snyk report summary}
+    \label{fig:snyk-report-summary2}
+\end{figure}
+\par The vulnerabilities used in this paper are: SQL Injection, XPath and Code Injection.
+\begin{table} [H]
+    \centering
+    \begin{tabular}{l|l|l|l|l}
+        Feature & TC ID & Input                  & Expected Output        & Output                 \\ \hline
+        SQL Injection    & TC01  & ' union select database() -- -              & Immediately Terminates &  bWAPP \\
+        XPath    & TC02  & ")]child::node()    & Immediately Terminates & all the data \\
+        Code Injection    & TC03  & system.log("ls -la")    & Immediately Terminates & all the content \\
+    \end{tabular}
+    \caption{\label{tab:TC-defensive}Defensive TC table.}
+\end{table}
 \section{Vulnerability Exploit}
 \label{}
 
@@ -244,7 +309,7 @@ We can use the beef project to exploit this vulnerability. First, we need to dow
 After we installed it and run the program, we can expose this service online using port forwarding or a reverse proxy, like ngrok.\ref{fig:beef-server-started}
 In this test run, the user machine attacked is in the same LAN network as the attacker, so this step is not needed.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{Figures/beef/beef-server-started.png}
     \caption{\label{fig:beef-server-started}beef server started}
@@ -345,8 +410,32 @@ the server will give us a reverse shell. \ref{fig:backdoor-installed}
 \label{}
 \textcolor{blue}{- a piece of code (Python, Java, etc.) that automates the vulnerability exploited such that data is extracted/changed/updated/compromised as using/exploiting the vulnerability.}
 
+\subsection{SQL Injection}
+In the page under the test, there was no sanitization of the input parameters, so SQL Injection was allowed. To see this in work, we can input the following text to gather the current database name: \textit{1' union select 1,database(),2,3,4,5,6,7,8 -- -}. The previous injection will stop the current search query and union the result with the a new row which contains the current database name and stop by next SQL statement by adding the comment characters at the end of the statement. The result can be observed in the Figure \ref{fig:defensive-sql-injection}.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/sql-injection.PNG}
+    \caption{SQL Injection}
+    \label{fig:defensive-sql-injection}
+\end{figure}
 
+\subsection{XPath}
+The data is read from a XML saved on the disk. We will try to gather all the data from the XML file. In this page, we can search for movies by their genre selected from a dropdown. To do that, we will send the following value for the genre param, \textit{'])child::node()}. This will expose the entire XML content in the table, as can be seen in Figure \ref{fig:defensive-xpath}. The previous statement will stop the current XML search and append a new function which will print the entire node of that selected element.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/xpath.PNG}
+    \caption{XPath}
+    \label{fig:defensive-xpath}
+\end{figure}
+\subsection{Code Injection}
+The page prints a message which is sent by the user. Because the print is made at the operating system level, this opens to vulnerabilties, if input is not properly sanitized. We will send the following value for the message field, \textit{system("ls -la")}. The previous statement will print the entire files found on the disk, as can be observed in the Figure \ref{fig:defensive-code-injection}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/code-injection.PNG}
+    \caption{Code injection}
+    \label{fig:defensive-code-injection}
+\end{figure}
 \section{Remediation Steps}
 \label{}
 
@@ -510,9 +599,58 @@ function commandi($data)
 shell_exec("ping -c 1 " . commandi($target));
 \end{lstlisting}
 
+\subsection{SQL Injection}
+\par The Figure \ref{fig:snyk-sql-injection-issue} shows that the SQL Injection is possible. To avoid this issue, the scanner suggests to sanitize the input using the \textit{mysqli\_real\_escape\_string} function. This function will sanitize the input and this will get off the vulnerability, as it is no longer captured by the scanner, in Figure \ref{fig:snyk-sql-injection-fix}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/sql-injection-problem.PNG}
+    \caption{SQL Injection captured by Snyk}
+    \label{fig:snyk-sql-injection-issue}
+\end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/sql-injection-fix.PNG}
+    \caption{Snyk SQL Injection fix}
+    \label{fig:snyk-sql-injection-fix}
+\end{figure}
+\subsection{XPath}
+\par The Figure \ref{fig:snyk-xpath-issue} shows that the XPath vulnerability exists in the code. To avoid this issue, the scanners suggests to replace the function argument with an escaped argument, which will escape the single quote characters. The solution is does not have a vulnerability, as can be seen in Figure \ref{fig:xpath-snyk-fix}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/xpath-issue-snyk.PNG}
+    \caption{XPath issue captured by Snyk}
+    \label{fig:snyk-xpath-issue}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/xpath-snyk-fix.PNG}
+    \caption{XPath Snyk fix}
+    \label{fig:xpath-snyk-fix}
+\end{figure}
+\subsection{Code Injection}
+\par The Figure \ref{fig:snyk-code-injection-issue} shows that the scanner captured a code injection vulnerability. The suggestion to fix this issue was not a good enough, because the scanner's suggestions only tackled specific use cases of the eval method. The solution was to use the echo function outside of the eval function, which works at operating system level. The found solution does not get a vulnerability warning message from the scanner. After replacing with more secured solutions, the number of vulnerabilities decreased, as suggested in the Figure \ref{fig:final-vulnerabilities-count}. The number of high vulnerabilities decreased with exactly 3 vulnerabilities, the ones solved above.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/code-injection.PNG}
+    \caption{Code Injected captured by Snyk}
+    \label{fig:snyk-code-injection-issue}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/code-injection-snyk-fix.PNG}
+    \caption{Code Injection fix}
+    \label{fig:snyk-code-injection-fix}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/defensive/issues2.PNG}
+    \caption{After solving vulnerabilities}
+    \label{fig:final-vulnerabilities-count}
+\end{figure}
 \section{Conclusions}
 \label{}
+\par The power of bringing the security in the development process using a SAST tool like Snyk makes the applications more secured and reliable on long-term. The way how easy is to integrate Snyk into your environment makes it a must-have tool for any project.
 
 Is important to correctly validate user input. The best way to validate user input is with predefined functions like \textit{htmlspecialchars}, \textit{addslashes}, \textit{escapeshellcmd}.
 When such function are not available, always have a whitelist of caracters instead of a blacklist.
