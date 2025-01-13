@@ -62,7 +62,7 @@ George Popovici, george.ioan.popovici@stud.ubbcluj.ro}
 \section{Software Tested}
 \label{label:Software_tested}
 
-We are testing the bWAPP web application.
+We are testing the bWAPP web application. \cite{bwapp}
 bWAPP, or a buggy web application, is a free and open source deliberately insecure web application.
 bWAPP is a PHP application that uses a MySQL database. It can be hosted on Linux/Windows with Apache/IIS and MySQL.
 
@@ -412,7 +412,7 @@ Next, we query "select GROUP\_CONCAT(table\_name,'\textbackslash n') from inform
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{Figures/sqli/sqliattack-3.png}
-    \caption{\label{fig: sqliattack-3}Column showing table names}
+    \caption{\label{fig:sqliattack-3}Column showing table names}
 \end{figure}
 We see a table named "users". Knowing that such a table exists, we input "select GROUP\_CONCAT(column\_name,'\textbackslash n') from information\_schema.columns where table\_name='users'". \ref{fig:sqliattack-4}
 \begin{figure}
@@ -433,19 +433,19 @@ Knowing its vulnerabilities to HTTP parameter pollution, we use the web app, we 
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{Figures/httppp/http-attack1.png}
-    \caption{\label{fig: httpattack-1}Normal end URL}
+    \caption{\label{fig:httpattack-1}Normal end URL}
 \end{figure}
 We can observe that the Iron Man movie’s id is 2. We want to tamper with the parameters such that Iron Man always wins. Therefore, we shall use the structure of the URL and the fact that PHP only registers the last appearance of a parameter in an HTTP request and query this username: \ref{fig:httpattack-2}
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{Figures/httppp/http-attack2.png}
-    \caption{\label{fig: httpattack-2}Suspicious username}
+    \caption{\label{fig:httpattack-2}Suspicious username}
 \end{figure}
 In the end our URL will look like this and the final page will show that we have voted for Iron Man no matter what we actually choose. \ref{fig:httpattack-3}
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{Figures/httppp/http-attack3.png}
-    \caption{\label{fig: httpattack-3}Suspicious end URL}
+    \caption{\label{fig:httpattack-3}Suspicious end URL}
 \end{figure}
 
 \subsection{SQL Injection}
